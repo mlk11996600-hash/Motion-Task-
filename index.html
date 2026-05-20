@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskForge — Zarabiaj na zadaniach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00e5a0;
+    --green-dim: #00e5a020;
+    --green-mid: #00e5a040;
+    --bg: #080810;
+    --bg2: #0d0d18;
+    --bg3: #12121f;
+    --border: #1e1e30;
+    --border2: #2a2a40;
+    --text: #e8e8f0;
+    --muted: #888898;
+    --faint: #44445a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--green); border-radius: 3px; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    background: rgba(8,8,16,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    height: 62px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-logo-icon { font-size: 22px; }
+  .nav-logo-text { font-weight: 800; font-size: 19px; color: #fff; letter-spacing: 0.5px; }
+  .nav-logo-badge { background: var(--green-dim); border: 1px solid var(--green-mid); color: var(--green); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; letter-spacing: 1.5px; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-link {
+    background: none; border: none; color: var(--muted);
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600;
+    padding: 7px 14px; border-radius: 5px; cursor: pointer;
+    transition: all 0.18s; letter-spacing: 0.3px;
+  }
+  .nav-link:hover, .nav-link.active { color: var(--green); background: var(--green-dim); }
+  .lang-switcher { display: flex; gap: 5px; }
+  .lang-btn {
+    background: none; border: 1px solid transparent; border-radius: 5px;
+    padding: 4px 9px; cursor: pointer; font-size: 17px;
+    transition: all 0.15s;
+  }
+  .lang-btn:hover { border-color: var(--border2); }
+  .lang-btn.active { border-color: var(--green-mid); background: var(--green-dim); }
+
+  /* SECTIONS */
+  section { display: none; }
+  section.visible { display: block; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 80px 24px 60px;
+    position: relative; overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-60%);
+    width: 700px; height: 700px;
+    background: radial-gradient(ellipse, #00e5a012 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-grid {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black, transparent);
+    opacity: 0.4;
+  }
+  .live-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--green-dim); border: 1px solid var(--green-mid);
+    border-radius: 20px; padding: 7px 18px; margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .live-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+  .live-text { color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: 2px; }
+  .hero-title {
+    font-size: clamp(36px, 6vw, 68px);
+    font-weight: 800; line-height: 1.05; letter-spacing: -2px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .hero-title .accent { color: var(--green); }
+  .hero-subtitle {
+    color: var(--muted); font-size: 18px; max-width: 520px;
+    line-height: 1.65; margin-bottom: 44px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+  .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; animation: fadeUp 0.6s 0.3s ease both; }
+  .btn-primary {
+    background: var(--green); color: #080810;
+    border: none; padding: 15px 34px; border-radius: 5px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
+  }
+  .btn-primary:hover { background: #00ffb5; transform: translateY(-2px); box-shadow: 0 8px 30px #00e5a030; }
+  .btn-secondary {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border2); padding: 15px 34px; border-radius: 5px;
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 15px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--green); color: var(--green); }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+  .stat-cell {
+    padding: 28px 24px; text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .stat-cell:last-child { border-right: none; }
+  .stat-val { font-family: 'Space Mono', monospace; font-size: 26px; font-weight: 700; color: var(--green); }
+  .stat-label { color: var(--faint); font-size: 11px; margin-top: 5px; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* HOW IT WORKS */
+  .section-inner { max-width: 1060px; margin: 0 auto; padding: 80px 24px; }
+  .section-label { color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; }
+  .section-title { font-size: clamp(26px, 4vw, 40px); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 48px; }
+  .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .step-card {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 32px 28px;
+    position: relative; overflow: hidden; transition: all 0.2s;
+  }
+  .step-card:hover { border-color: var(--green-mid); transform: translateY(-3px); }
+  .step-card::before {
+    content: attr(data-num);
+    position: absolute; top: -10px; right: 20px;
+    font-family: 'Space Mono', monospace; font-size: 80px; font-weight: 700;
+    color: var(--green-dim); line-height: 1; pointer-events: none;
+  }
+  .step-icon { font-size: 36px; margin-bottom: 18px; }
+  .step-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+  .step-desc { color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+  /* COMPANIES */
+  .companies-section { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .companies-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .company-card {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 22px 18px; text-align: center;
+    transition: all 0.2s; cursor: default;
+  }
+  .company-card:hover { border-color: var(--green-mid); background: #14141f; }
+  .company-icon { font-size: 30px; margin-bottom: 10px; }
+  .company-name { font-weight: 700; font-size: 14px; }
+  .company-type { color: var(--faint); font-size: 11px; margin-top: 4px; letter-spacing: 0.5px; }
+  .company-tag { display: inline-block; margin-top: 8px; background: var(--green-dim); color: var(--green); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; letter-spacing: 1px; }
+
+  /* PAYMENT METHODS */
+  .payment-section { background: var(--bg); }
+  .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .payment-card {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 28px;
+  }
+  .payment-card-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .payment-methods { display: flex; flex-direction: column; gap: 10px; }
+  .payment-method {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px 16px;
+  }
+  .payment-method-icon { font-size: 22px; }
+  .payment-method-name { font-weight: 600; font-size: 13px; }
+  .payment-method-desc { color: var(--faint); font-size: 11px; }
+
+  /* FOOTER */
+  footer {
+    background: var(--bg2); border-top: 1px solid var(--border);
+    padding: 32px; text-align: center; color: var(--faint); font-size: 13px;
+  }
+  footer a { color: var(--green); text-decoration: none; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.8); } }
+
+  /* ── TASKS PANEL ── */
+  .tasks-header { background: var(--bg2); border-bottom: 1px solid var(--border); padding-top: 62px; }
+  .tasks-header-inner { max-width: 1100px; margin: 0 auto; padding: 32px 24px 0; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; }
+  .tasks-title { font-size: clamp(22px,3.5vw,36px); font-weight: 800; letter-spacing: -0.5px; margin-top: 6px; }
+  .tasks-user-bar { display: flex; gap: 1px; background: var(--border); border-radius: 8px; overflow: hidden; }
+  .user-stat { background: var(--bg3); padding: 14px 22px; display: flex; flex-direction: column; gap: 2px; }
+  .user-stat-val { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--green); }
+  .user-stat-label { font-size: 10px; color: var(--faint); letter-spacing: 1px; text-transform: uppercase; }
+  .filters-bar { max-width: 1100px; margin: 0 auto; padding: 18px 24px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .filter-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .filter-label { color: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+  .filter-btn { background: var(--bg3); border: 1px solid var(--border2); color: var(--muted); padding: 6px 13px; border-radius: 4px; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .filter-btn:hover { color: var(--text); border-color: var(--green-mid); }
+  .filter-btn.active, .filter-btn.active-cat { background: var(--green); color: #080810; border-color: var(--green); }
+  .search-input { background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 8px 14px; border-radius: 5px; font-family: 'Syne', sans-serif; font-size: 13px; outline: none; width: 200px; transition: border 0.2s; }
+  .search-input:focus { border-color: var(--green); }
+  .tasks-grid-wrap { max-width: 1100px; margin: 0 auto; padding: 28px 24px 60px; }
+  .tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px; }
+  .task-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 22px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 14px; }
+  .task-card:hover { border-color: var(--green-mid); transform: translateY(-3px); box-shadow: 0 8px 30px #00000040; }
+  .task-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .task-card.easy::after { background: #00e5a0; }
+  .task-card.medium::after { background: #ffd166; }
+  .task-card.hard::after { background: #ff6b6b; }
+  .tc-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .tc-company { display: flex; align-items: center; gap: 8px; }
+  .tc-logo { font-size: 26px; }
+  .tc-company-name { font-size: 11px; color: var(--faint); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+  .tc-diff { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase; }
+  .tc-diff.easy { background: #00e5a015; color: #00e5a0; border: 1px solid #00e5a030; }
+  .tc-diff.medium { background: #ffd16615; color: #ffd166; border: 1px solid #ffd16630; }
+  .tc-diff.hard { background: #ff6b6b15; color: #ff6b6b; border: 1px solid #ff6b6b30; }
+  .tc-title { font-size: 16px; font-weight: 700; line-height: 1.35; }
+  .tc-meta { display: flex; gap: 16px; }
+  .tc-meta-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+  .tc-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+  .tc-reward { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--green); }
+  .tc-btn { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-mid); padding: 8px 16px; border-radius: 5px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+  .tc-btn:hover { background: var(--green); color: #080810; }
+  .tc-category { font-size: 10px; color: var(--faint); background: var(--bg2); padding: 2px 8px; border-radius: 3px; border: 1px solid var(--border); }
+  .modal-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(8,8,16,0.88); backdrop-filter: blur(6px); align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: var(--bg3); border: 1px solid var(--border2); border-radius: 12px; width: 90%; max-width: 540px; padding: 32px; position: relative; animation: fadeUp 0.25s ease; }
+  .modal-close { position: absolute; top: 16px; right: 16px; background: var(--bg2); border: 1px solid var(--border2); color: var(--muted); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 14px; transition: all 0.15s; }
+  .modal-close:hover { border-color: var(--green); color: var(--green); }
+  .modal-logo { font-size: 48px; margin-bottom: 16px; }
+  .modal-company { color: var(--faint); font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; }
+  .modal-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .modal-detail { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+  .modal-detail-label { font-size: 10px; color: var(--faint); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .modal-detail-val { font-size: 16px; font-weight: 700; }
+  .modal-desc { color: var(--muted); font-size: 14px; line-height: 1.7; margin-bottom: 24px; }
+  .modal-accept { width: 100%; padding: 15px; background: var(--green); color: #080810; border: none; border-radius: 6px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .modal-accept:hover { background: #00ffb5; }
+  .modal-accept.accepted { background: var(--bg2); color: var(--green); border: 1px solid var(--green-mid); cursor: default; }
+  .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--green); color: #080810; padding: 12px 24px; border-radius: 6px; font-weight: 700; font-size: 14px; z-index: 1000; transition: transform 0.3s ease; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── WALLET ── */
+  .wallet-wrap { padding-top: 62px; min-height: 100vh; }
+  .wallet-header { max-width: 1100px; margin: 0 auto; padding: 32px 24px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .wallet-address-bar { display: flex; align-items: center; gap: 10px; background: var(--bg3); border: 1px solid var(--green-mid); border-radius: 6px; padding: 8px 14px; font-family: 'Space Mono', monospace; font-size: 13px; }
+  .wallet-addr-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; flex-shrink: 0; }
+  .wallet-disconnect-btn { background: none; border: 1px solid var(--border2); color: var(--muted); padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'Syne', sans-serif; transition: all 0.15s; }
+  .wallet-disconnect-btn:hover { border-color: #ff6b6b; color: #ff6b6b; }
+
+  .balance-grid { max-width: 1100px; margin: 0 auto; padding: 0 24px 24px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px; }
+  .balance-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 22px; position: relative; overflow: hidden; }
+  .main-balance { border-color: var(--green-mid); }
+  .balance-label { font-size: 11px; color: var(--faint); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .balance-amount { font-family: 'Space Mono', monospace; font-size: 34px; font-weight: 700; color: #fff; }
+  .balance-amount.small { font-size: 24px; }
+  .balance-sub { color: var(--faint); font-size: 12px; margin-top: 6px; }
+  .balance-sparkline { position: absolute; bottom: 0; left: 0; right: 0; opacity: 0.8; }
+
+  .wallet-main { max-width: 1100px; margin: 0 auto; padding: 0 24px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .wallet-col { display: flex; flex-direction: column; gap: 16px; }
+  .wallet-panel { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+  .wallet-panel-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+  .method-tabs { display: flex; gap: 6px; margin-bottom: 20px; background: var(--bg2); border-radius: 6px; padding: 4px; }
+  .method-tab { flex: 1; background: none; border: none; color: var(--muted); padding: 9px; border-radius: 4px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .method-tab.active { background: var(--bg3); color: var(--text); box-shadow: 0 1px 4px #00000040; }
+  .method-content { display: none; }
+  .method-content.active { display: block; }
+
+  .method-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+  .method-option { cursor: pointer; }
+  .method-option input { display: none; }
+  .method-option-inner { display: flex; align-items: center; gap: 12px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 7px; padding: 12px 14px; transition: all 0.15s; }
+  .method-option input:checked + .method-option-inner { border-color: var(--green); background: var(--green-dim); }
+  .method-option-inner:hover { border-color: var(--green-mid); }
+  .method-icon { font-size: 22px; }
+  .method-name { font-weight: 700; font-size: 14px; }
+  .method-desc { color: var(--faint); font-size: 11px; margin-top: 2px; }
+
+  .form-group { margin-bottom: 14px; }
+  .form-label { display: block; font-size: 11px; font-weight: 700; color: var(--faint); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 7px; }
+  .amount-input-wrap { display: flex; align-items: center; background: var(--bg2); border: 1px solid var(--border2); border-radius: 6px; overflow: hidden; transition: border 0.2s; }
+  .amount-input-wrap:focus-within { border-color: var(--green); }
+  .amount-currency { padding: 0 12px; color: var(--muted); font-weight: 700; font-size: 16px; }
+  .amount-input { flex: 1; background: none; border: none; color: var(--text); font-family: 'Space Mono', monospace; font-size: 18px; padding: 12px 0; outline: none; }
+  .amount-max { background: var(--green-dim); border: none; border-left: 1px solid var(--border2); color: var(--green); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 11px; padding: 0 14px; cursor: pointer; height: 100%; letter-spacing: 1px; transition: all 0.15s; }
+  .amount-max:hover { background: var(--green); color: #080810; }
+  .wallet-input { width: 100%; background: var(--bg2); border: 1px solid var(--border2); border-radius: 6px; padding: 11px 14px; color: var(--text); font-family: 'Space Mono', monospace; font-size: 12px; outline: none; transition: border 0.2s; }
+  .wallet-input:focus { border-color: var(--green); }
+  .withdraw-btn { width: 100%; margin-top: 6px; padding: 14px; background: var(--green); color: #080810; border: none; border-radius: 6px; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px; }
+  .withdraw-btn:hover { background: #00ffb5; transform: translateY(-1px); box-shadow: 0 6px 24px #00e5a030; }
+
+  .crypto-wallets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .crypto-wallet-btn { background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 16px 12px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .crypto-wallet-btn:hover { border-color: var(--green-mid); background: var(--bg3); }
+  .crypto-wallet-btn.connected { border-color: var(--green); background: var(--green-dim); }
+  .cw-icon { font-size: 28px; }
+  .cw-name { font-weight: 700; font-size: 13px; color: var(--text); }
+  .cw-coins { font-size: 10px; color: var(--faint); letter-spacing: 0.5px; }
+  .connected-wallet-info { background: var(--green-dim); border: 1px solid var(--green-mid); border-radius: 6px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: var(--green); font-family: 'Space Mono', monospace; }
+  .coin-select { display: flex; gap: 6px; flex-wrap: wrap; }
+  .coin-btn { background: var(--bg2); border: 1px solid var(--border2); color: var(--muted); padding: 6px 14px; border-radius: 4px; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+  .coin-btn.active { background: var(--green); color: #080810; border-color: var(--green); }
+  .fee-note { font-size: 11px; color: var(--faint); margin-bottom: 12px; padding: 8px 12px; background: var(--bg2); border-radius: 4px; border-left: 2px solid var(--green-mid); }
+
+  /* TX History */
+  .tx-list { display: flex; flex-direction: column; gap: 8px; max-height: 340px; overflow-y: auto; }
+  .tx-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg2); border-radius: 6px; border: 1px solid var(--border); }
+  .tx-icon { font-size: 20px; width: 36px; height: 36px; background: var(--bg3); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .tx-info { flex: 1; }
+  .tx-desc { font-size: 13px; font-weight: 600; }
+  .tx-date { font-size: 11px; color: var(--faint); margin-top: 2px; }
+  .tx-amount { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; white-space: nowrap; }
+  .tx-amount.pos { color: var(--green); }
+  .tx-amount.neg { color: #ff6b6b; }
+  .tx-badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; display: inline-block; }
+  .tx-badge.done { background: #00e5a015; color: var(--green); border: 1px solid #00e5a030; }
+  .tx-badge.pending { background: #ffd16615; color: #ffd166; border: 1px solid #ffd16630; }
+
+  .commission-box { background: var(--bg3); border: 1px solid var(--green-mid); border-radius: 10px; padding: 20px; display: flex; align-items: center; gap: 16px; }
+  .commission-icon { font-size: 32px; }
+  .commission-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .commission-desc { color: var(--faint); font-size: 12px; line-height: 1.5; }
+  .commission-val { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--green); margin-left: auto; white-space: nowrap; }
+
+  /* ── ADMIN ── */
+  .admin-wrap { padding-top: 62px; min-height: 100vh; }
+  .admin-header { max-width: 1200px; margin: 0 auto; padding: 32px 24px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .admin-live-badge { display: flex; align-items: center; gap: 8px; background: var(--green-dim); border: 1px solid var(--green-mid); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700; color: var(--green); letter-spacing: 1px; }
+
+  .kpi-grid { max-width: 1200px; margin: 0 auto; padding: 0 24px 20px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .kpi-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 20px 18px; }
+  .kpi-card.accent { border-color: var(--green-mid); background: linear-gradient(135deg, #0f1f18, var(--bg3)); }
+  .kpi-icon { font-size: 24px; margin-bottom: 10px; }
+  .kpi-val { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .kpi-label { font-size: 11px; color: var(--faint); letter-spacing: 0.5px; margin-bottom: 8px; }
+  .kpi-trend { font-size: 11px; font-weight: 700; }
+  .kpi-trend.up { color: var(--green); }
+
+  .admin-charts-row { max-width: 1200px; margin: 0 auto; padding: 0 24px 16px; display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+  .admin-panel { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 22px; }
+  .chart-panel { }
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; margin-bottom: 8px; }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--green-dim); border: 1px solid var(--green-mid); transition: all 0.3s; cursor: pointer; position: relative; }
+  .bar:hover { background: var(--green); }
+  .bar-val { font-size: 9px; color: var(--faint); font-family: 'Space Mono', monospace; }
+  .bar-labels { display: flex; gap: 8px; }
+  .bar-label { flex: 1; text-align: center; font-size: 10px; color: var(--faint); letter-spacing: 0.5px; }
+
+  .top-tasks-list { display: flex; flex-direction: column; gap: 8px; }
+  .top-task-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg2); border-radius: 6px; border: 1px solid var(--border); }
+  .top-task-rank { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: var(--faint); width: 20px; }
+  .top-task-name { flex: 1; font-size: 13px; font-weight: 600; }
+  .top-task-count { font-size: 11px; color: var(--faint); white-space: nowrap; }
+  .top-task-bar { height: 4px; background: var(--green-dim); border-radius: 2px; margin-top: 4px; }
+  .top-task-bar-fill { height: 100%; background: var(--green); border-radius: 2px; }
+
+  .admin-bottom-row { max-width: 1200px; margin: 0 auto; padding: 0 24px 60px; display: flex; gap: 16px; }
+  .admin-task-table { display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow-y: auto; margin-top: 4px; }
+  .admin-task-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 80px; gap: 12px; align-items: center; padding: 10px 14px; background: var(--bg2); border-radius: 6px; border: 1px solid var(--border); font-size: 13px; transition: border 0.15s; }
+  .admin-task-row:hover { border-color: var(--green-mid); }
+  .admin-task-row.header { background: none; border-color: transparent; color: var(--faint); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding-bottom: 6px; }
+  .atr-name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .atr-reward { font-family: 'Space Mono', monospace; color: var(--green); font-weight: 700; }
+  .atr-actions { display: flex; gap: 6px; }
+  .atr-btn { background: none; border: 1px solid var(--border2); color: var(--muted); padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all 0.15s; font-family: 'Syne', sans-serif; }
+  .atr-btn:hover { border-color: var(--green); color: var(--green); }
+  .atr-btn.del:hover { border-color: #ff6b6b; color: #ff6b6b; }
+
+  .partner-list { display: flex; flex-direction: column; gap: 8px; }
+  .partner-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--bg2); border-radius: 6px; border: 1px solid var(--border); }
+  .partner-icon { font-size: 20px; }
+  .partner-name { font-weight: 700; font-size: 13px; flex: 1; }
+  .partner-tasks { font-size: 11px; color: var(--faint); }
+  .partner-status { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .steps-grid, .companies-grid, .payment-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .tasks-user-bar { display: none; }
+    .filters-bar { gap: 10px; }
+    .balance-grid { grid-template-columns: 1fr 1fr; }
+    .wallet-main { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2,1fr); }
+    .admin-charts-row, .admin-bottom-row { grid-template-columns: 1fr; flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <span class="nav-logo-icon">⚡</span>
+    <span class="nav-logo-text">TaskForge</span>
+    <span class="nav-logo-badge">BETA</span>
+  </a>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showSection('home',this)" data-i18n="nav_home">Strona główna</button>
+    <button class="nav-link" onclick="showSection('tasks',this)" data-i18n="nav_tasks">Zadania</button>
+    <button class="nav-link" onclick="showSection('wallet',this)" data-i18n="nav_wallet">Portfel</button>
+    <button class="nav-link" onclick="showSection('admin',this)" data-i18n="nav_admin">Admin</button>
+  </div>
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLang('pl',this)">🇵🇱</button>
+    <button class="lang-btn" onclick="setLang('en',this)">🇬🇧</button>
+    <button class="lang-btn" onclick="setLang('de',this)">🇩🇪</button>
+    <button class="lang-btn" onclick="setLang('th',this)">🇹🇭</button>
+  </div>
+</nav>
+
+<!-- SECTION: HOME -->
+<section id="home" class="visible">
+
+  <!-- Hero -->
+  <div id="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      <span class="live-text">LIVE PLATFORM</span>
+    </div>
+    <h1 class="hero-title" data-i18n="hero_title">
+      Zarabiaj na<br><span class="accent">wykonywaniu zadań</span>
+    </h1>
+    <p class="hero-subtitle" data-i18n="hero_sub">
+      Dołącz do tysięcy użytkowników którzy zarabiają realną gotówkę i krypto wypełniając zadania od globalnych firm.
+    </p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="showSection('tasks',null)" data-i18n="hero_cta1">Zacznij zarabiać →</button>
+      <button class="btn-secondary" onclick="showSection('admin',null)" data-i18n="hero_cta2">Dla firm</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-cell">
+      <div class="stat-val">47,293</div>
+      <div class="stat-label" data-i18n="stat1">Aktywnych użytkowników</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">€2.3M</div>
+      <div class="stat-label" data-i18n="stat2">Wypłaconych</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">3,847</div>
+      <div class="stat-label" data-i18n="stat3">Dostępnych zadań</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">8</div>
+      <div class="stat-label" data-i18n="stat4">Firm partnerskich</div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="section-inner">
+    <div class="section-label" data-i18n="how_label">Jak to działa</div>
+    <h2 class="section-title" data-i18n="how_title">Trzy kroki do zarobku</h2>
+    <div class="steps-grid">
+      <div class="step-card" data-num="01">
+        <div class="step-icon">📋</div>
+        <div class="step-title" data-i18n="step1_title">Wybierz zadanie</div>
+        <div class="step-desc" data-i18n="step1_desc">Przeglądaj setki zadań od sprawdzonych firm. Filtruj po kategorii, trudności i wynagrodzeniu.</div>
+      </div>
+      <div class="step-card" data-num="02">
+        <div class="step-icon">✅</div>
+        <div class="step-title" data-i18n="step2_title">Wykonaj i wyślij</div>
+        <div class="step-desc" data-i18n="step2_desc">Zrealizuj zadanie w wyznaczonym czasie. Nasz system automatycznie weryfikuje jakość.</div>
+      </div>
+      <div class="step-card" data-num="03">
+        <div class="step-icon">💰</div>
+        <div class="step-title" data-i18n="step3_title">Otrzymaj płatność</div>
+        <div class="step-desc" data-i18n="step3_desc">Wypłać zarobki przelewem, PayPal lub krypto — bezpośrednio na Twój portfel.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Companies -->
+  <div class="companies-section">
+    <div class="section-inner">
+      <div class="section-label" data-i18n="companies_label">Partnerzy</div>
+      <h2 class="section-title" data-i18n="companies_title">Firmy które płacą za zadania</h2>
+      <div class="companies-grid">
+        <div class="company-card"><div class="company-icon">🤖</div><div class="company-name">Scale AI</div><div class="company-type">AI / Machine Learning</div><span class="company-tag">AKTYWNY</span></div>
+        <div class="company-card"><div class="company-icon">🧪</div><div class="company-name">Testlio</div><div class="company-type">QA Testing</div><span class="company-tag">AKTYWNY</span></div>
+        <div class="company-card"><div class="company-icon">🎙️</div><div class="company-name">Rev.com</div><div class="company-type">Transkrypcja</div><span class="company-tag">AKTYWNY</span></div>
+        <div class="company-card"><div class="company-icon">📊</div><div class="company-name">Toluna</div><div class="company-type">Ankiety / Badania</div><span class="company-tag">AKTYWNY</span></div>
+        <div class="company-card"><div class="company-icon">🌐</div><div class="company-name">Welocalize</div><div class="company-type">Tłumaczenia</div><span class="company-tag">AKTYWNY</span></div>
+        <div class="company-card"><div class="company-icon">🛡️</div><div class="company-name">Cogito Tech</div><div class="company-type">Moderacja treści</div><span class="company-tag">AKTYWNY</span></div>
+        <div class="company-card"><div class="company-icon">📍</div><div class="company-name">HERE Maps</div><div class="company-type">Dane geograficzne</div><span class="company-tag">AKTYWNY</span></div>
+        <div class="company-card"><div class="company-icon">⭐</div><div class="company-name">Bazaarvoice</div><div class="company-type">Recenzje produktów</div><span class="company-tag">AKTYWNY</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Methods -->
+  <div class="payment-section">
+    <div class="section-inner">
+      <div class="section-label" data-i18n="pay_label">Płatności</div>
+      <h2 class="section-title" data-i18n="pay_title">Wypłać jak chcesz</h2>
+      <div class="payment-grid">
+        <div class="payment-card">
+          <div class="payment-card-title">🏦 <span data-i18n="pay_trad">Tradycyjne metody</span></div>
+          <div class="payment-methods">
+            <div class="payment-method"><span class="payment-method-icon">🏛️</span><div><div class="payment-method-name">Przelew bankowy (SEPA)</div><div class="payment-method-desc">1-2 dni robocze · min. €10</div></div></div>
+            <div class="payment-method"><span class="payment-method-icon">🅿️</span><div><div class="payment-method-name">PayPal</div><div class="payment-method-desc">Natychmiastowy · min. €5</div></div></div>
+            <div class="payment-method"><span class="payment-method-icon">💳</span><div><div class="payment-method-name">Wise / Revolut</div><div class="payment-method-desc">Natychmiastowy · min. €1</div></div></div>
+          </div>
+        </div>
+        <div class="payment-card">
+          <div class="payment-card-title">₿ <span data-i18n="pay_crypto">Kryptowaluty</span></div>
+          <div class="payment-methods">
+            <div class="payment-method"><span class="payment-method-icon">🦊</span><div><div class="payment-method-name">MetaMask (ETH / USDT)</div><div class="payment-method-desc">Natychmiastowy · Gas fee</div></div></div>
+            <div class="payment-method"><span class="payment-method-icon">🟠</span><div><div class="payment-method-name">Bitcoin (BTC)</div><div class="payment-method-desc">~10 min · min. €20</div></div></div>
+            <div class="payment-method"><span class="payment-method-icon">🟣</span><div><div class="payment-method-name">USDC / USDT (Polygon)</div><div class="payment-method-desc">~30 sek · min. €2</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- SECTION: TASKS — Etap 2 -->
+<section id="tasks">
+  <div class="tasks-header">
+    <div class="tasks-header-inner">
+      <div>
+        <div class="section-label" data-i18n="tasks_label">Dostępne zadania</div>
+        <h1 class="tasks-title" data-i18n="tasks_title">Wybierz zadanie i zarabiaj</h1>
+      </div>
+      <div class="tasks-user-bar">
+        <div class="user-stat"><span class="user-stat-val" id="user-balance">€43.50</span><span class="user-stat-label" data-i18n="t_balance">Saldo</span></div>
+        <div class="user-stat"><span class="user-stat-val" id="user-done">7</span><span class="user-stat-label" data-i18n="t_done">Ukończone</span></div>
+        <div class="user-stat"><span class="user-stat-val" id="user-rank">⭐ 4.9</span><span class="user-stat-label" data-i18n="t_rating">Ocena</span></div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="filter-group">
+        <span class="filter-label" data-i18n="t_difficulty">Trudność:</span>
+        <button class="filter-btn active" onclick="filterTasks('all',this)" data-i18n="t_all">Wszystkie</button>
+        <button class="filter-btn easy" onclick="filterTasks('easy',this)" data-i18n="t_easy">🟢 Łatwe</button>
+        <button class="filter-btn medium" onclick="filterTasks('medium',this)" data-i18n="t_medium">🟡 Średnie</button>
+        <button class="filter-btn hard" onclick="filterTasks('hard',this)" data-i18n="t_hard">🔴 Trudne</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label" data-i18n="t_category">Kategoria:</span>
+        <button class="filter-btn active-cat" onclick="filterCat('all',this)" data-i18n="t_all">Wszystkie</button>
+        <button class="filter-btn" onclick="filterCat('AI/ML',this)">AI/ML</button>
+        <button class="filter-btn" onclick="filterCat('QA',this)">QA</button>
+        <button class="filter-btn" onclick="filterCat('Data',this)">Data</button>
+        <button class="filter-btn" onclick="filterCat('Survey',this)">Survey</button>
+        <button class="filter-btn" onclick="filterCat('Language',this)">Language</button>
+      </div>
+      <div style="margin-left:auto;">
+        <input class="search-input" type="text" id="task-search" placeholder="🔍 Szukaj..." oninput="searchTasks(this.value)" data-i18n-placeholder="t_search">
+      </div>
+    </div>
+  </div>
+
+  <!-- Task Grid -->
+  <div class="tasks-grid-wrap">
+    <div class="tasks-grid" id="tasks-grid"></div>
+    <div id="tasks-empty" style="display:none;text-align:center;padding:60px;color:var(--muted);">
+      <div style="font-size:40px;margin-bottom:12px;">🔍</div>
+      <p data-i18n="t_noresult">Brak wyników. Zmień filtry.</p>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="task-modal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeTaskModal()">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+</section>
+
+<!-- SECTION: WALLET — Etap 3 -->
+<section id="wallet">
+  <div class="wallet-wrap">
+
+    <!-- TOP HEADER -->
+    <div class="wallet-header">
+      <div>
+        <div class="section-label" data-i18n="w_label">Portfel & Płatności</div>
+        <h1 class="tasks-title" data-i18n="w_title">Twoje zarobki</h1>
+      </div>
+      <div class="wallet-address-bar" id="wallet-addr-bar" style="display:none">
+        <span class="wallet-addr-dot"></span>
+        <span id="wallet-addr-text">0x0000...0000</span>
+        <button class="wallet-disconnect-btn" onclick="disconnectWallet()" data-i18n="w_disconnect">Rozłącz</button>
+      </div>
+    </div>
+
+    <!-- BALANCE CARDS -->
+    <div class="balance-grid">
+      <div class="balance-card main-balance">
+        <div class="balance-label" data-i18n="w_total">Saldo całkowite</div>
+        <div class="balance-amount" id="w-total-balance">€ 43.50</div>
+        <div class="balance-sub" data-i18n="w_available">Dostępne do wypłaty</div>
+        <div class="balance-sparkline">
+          <svg width="100%" height="48" viewBox="0 0 200 48" preserveAspectRatio="none">
+            <polyline points="0,40 30,32 60,36 90,20 120,24 150,12 180,16 200,6" fill="none" stroke="#00e5a040" stroke-width="1.5"/>
+            <polyline points="0,40 30,32 60,36 90,20 120,24 150,12 180,16 200,6 200,48 0,48" fill="#00e5a010" stroke="none"/>
+          </svg>
+        </div>
+      </div>
+      <div class="balance-card">
+        <div class="balance-label" data-i18n="w_pending">Oczekuje</div>
+        <div class="balance-amount small" style="color:#ffd166">€ 12.00</div>
+        <div class="balance-sub" data-i18n="w_pending_sub">Weryfikacja zadań</div>
+      </div>
+      <div class="balance-card">
+        <div class="balance-label" data-i18n="w_earned_month">Zarobiono (maj)</div>
+        <div class="balance-amount small" style="color:#00e5a0">€ 89.50</div>
+        <div class="balance-sub">↑ 23% vs kwiecień</div>
+      </div>
+      <div class="balance-card">
+        <div class="balance-label" data-i18n="w_total_paid">Łącznie wypłacono</div>
+        <div class="balance-amount small">€ 312.00</div>
+        <div class="balance-sub" data-i18n="w_all_time">Od początku</div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT: 2 columns -->
+    <div class="wallet-main">
+
+      <!-- LEFT: WITHDRAW -->
+      <div class="wallet-col">
+        <div class="wallet-panel">
+          <div class="wallet-panel-title">
+            <span>💸</span>
+            <span data-i18n="w_withdraw">Wypłać środki</span>
+          </div>
+
+          <!-- Method tabs -->
+          <div class="method-tabs">
+            <button class="method-tab active" onclick="switchMethod('fiat',this)" data-i18n="w_fiat">🏦 Tradycyjne</button>
+            <button class="method-tab" onclick="switchMethod('crypto',this)" data-i18n="w_crypto">₿ Krypto</button>
+          </div>
+
+          <!-- FIAT -->
+          <div id="method-fiat" class="method-content active">
+            <div class="method-options">
+              <label class="method-option">
+                <input type="radio" name="fiat-method" value="bank" checked>
+                <div class="method-option-inner">
+                  <span class="method-icon">🏛️</span>
+                  <div><div class="method-name">SEPA Bank Transfer</div><div class="method-desc" data-i18n="w_sepa_desc">1–2 dni · min. €10</div></div>
+                </div>
+              </label>
+              <label class="method-option">
+                <input type="radio" name="fiat-method" value="paypal">
+                <div class="method-option-inner">
+                  <span class="method-icon">🅿️</span>
+                  <div><div class="method-name">PayPal</div><div class="method-desc" data-i18n="w_paypal_desc">Natychmiastowy · min. €5</div></div>
+                </div>
+              </label>
+              <label class="method-option">
+                <input type="radio" name="fiat-method" value="wise">
+                <div class="method-option-inner">
+                  <span class="method-icon">💳</span>
+                  <div><div class="method-name">Wise / Revolut</div><div class="method-desc" data-i18n="w_wise_desc">Natychmiastowy · min. €1</div></div>
+                </div>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="w_amount">Kwota (€)</label>
+              <div class="amount-input-wrap">
+                <span class="amount-currency">€</span>
+                <input class="amount-input" type="number" id="fiat-amount" placeholder="0.00" min="1" max="43.50" step="0.01">
+                <button class="amount-max" onclick="setMax('fiat-amount',43.50)">MAX</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="w_dest">Dane odbiorcy</label>
+              <input class="wallet-input" type="text" id="fiat-dest" data-i18n-placeholder="w_dest_placeholder" placeholder="IBAN / email PayPal / Wise handle">
+            </div>
+            <button class="withdraw-btn" onclick="doWithdraw('fiat')" data-i18n="w_withdraw_btn">Wypłać środki →</button>
+          </div>
+
+          <!-- CRYPTO -->
+          <div id="method-crypto" class="method-content">
+            <div class="crypto-wallets-grid">
+              <button class="crypto-wallet-btn" id="cwb-metamask" onclick="connectWallet('MetaMask','🦊','ETH')">
+                <span class="cw-icon">🦊</span>
+                <span class="cw-name">MetaMask</span>
+                <span class="cw-coins">ETH · USDT · USDC</span>
+              </button>
+              <button class="crypto-wallet-btn" id="cwb-trust" onclick="connectWallet('Trust Wallet','🛡️','BNB')">
+                <span class="cw-icon">🛡️</span>
+                <span class="cw-name">Trust Wallet</span>
+                <span class="cw-coins">BTC · BNB · ETH</span>
+              </button>
+              <button class="crypto-wallet-btn" id="cwb-coinbase" onclick="connectWallet('Coinbase','🔵','USDC')">
+                <span class="cw-icon">🔵</span>
+                <span class="cw-name">Coinbase Wallet</span>
+                <span class="cw-coins">ETH · USDC · SOL</span>
+              </button>
+              <button class="crypto-wallet-btn" id="cwb-phantom" onclick="connectWallet('Phantom','👻','SOL')">
+                <span class="cw-icon">👻</span>
+                <span class="cw-name">Phantom</span>
+                <span class="cw-coins">SOL · USDC</span>
+              </button>
+            </div>
+
+            <div id="crypto-form" style="display:none">
+              <div class="connected-wallet-info" id="connected-wallet-info"></div>
+              <div class="form-group">
+                <label class="form-label" data-i18n="w_coin">Token</label>
+                <div class="coin-select" id="coin-select"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" data-i18n="w_amount">Kwota (€)</label>
+                <div class="amount-input-wrap">
+                  <span class="amount-currency">€</span>
+                  <input class="amount-input" type="number" id="crypto-amount" placeholder="0.00" min="2" max="43.50" step="0.01">
+                  <button class="amount-max" onclick="setMax('crypto-amount',43.50)">MAX</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" data-i18n="w_wallet_addr">Adres portfela</label>
+                <input class="wallet-input" type="text" id="crypto-addr" placeholder="0x... / bc1... / sol...">
+              </div>
+              <div class="fee-note" id="fee-note">⛽ Gas fee: ~$2.10 · Sieć: Ethereum</div>
+              <button class="withdraw-btn" onclick="doWithdraw('crypto')" data-i18n="w_send_crypto">Wyślij krypto →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: HISTORY -->
+      <div class="wallet-col">
+        <div class="wallet-panel">
+          <div class="wallet-panel-title">
+            <span>📋</span>
+            <span data-i18n="w_history">Historia transakcji</span>
+          </div>
+          <div class="tx-list" id="tx-list"></div>
+        </div>
+
+        <!-- Commission info box -->
+        <div class="commission-box">
+          <div class="commission-icon">💼</div>
+          <div>
+            <div class="commission-title" data-i18n="w_commission_title">Twoja prowizja jako właściciel</div>
+            <div class="commission-desc" data-i18n="w_commission_desc">Zarabiasz 10% od każdego zadania wykonanego na platformie</div>
+          </div>
+          <div class="commission-val" id="commission-earned">€ 8.74</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Withdraw toast -->
+  <div id="wallet-toast" class="toast"></div>
+</section>
+
+<!-- SECTION: ADMIN — Etap 4 -->
+<section id="admin">
+  <div class="admin-wrap">
+
+    <div class="admin-header">
+      <div>
+        <div class="section-label" data-i18n="a_label">Panel administratora</div>
+        <h1 class="tasks-title" data-i18n="a_title">Dashboard właściciela</h1>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="admin-live-badge"><span class="live-dot"></span><span data-i18n="a_live">Na żywo</span></div>
+        <button class="btn-primary" style="padding:10px 20px;font-size:13px" onclick="showAddTaskModal()" data-i18n="a_add_task">+ Dodaj zadanie</button>
+      </div>
+    </div>
+
+    <!-- KPI ROW -->
+    <div class="kpi-grid">
+      <div class="kpi-card accent">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-val" id="kpi-revenue">€ 847.30</div>
+        <div class="kpi-label" data-i18n="a_revenue">Przychód platformy (maj)</div>
+        <div class="kpi-trend up">↑ 18% vs kwiecień</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">🔑</div>
+        <div class="kpi-val" style="color:var(--green)">€ 84.73</div>
+        <div class="kpi-label" data-i18n="a_commission">Twoja prowizja (10%)</div>
+        <div class="kpi-trend up">↑ 18% vs kwiecień</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">👥</div>
+        <div class="kpi-val" id="kpi-users">47,293</div>
+        <div class="kpi-label" data-i18n="a_users">Zarejestrowani użytkownicy</div>
+        <div class="kpi-trend up">↑ 412 dziś</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-val" id="kpi-tasks-done">1,847</div>
+        <div class="kpi-label" data-i18n="a_tasks_done">Zadań ukończonych (maj)</div>
+        <div class="kpi-trend up">↑ 9% vs kwiecień</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">⚡</div>
+        <div class="kpi-val" id="kpi-active">324</div>
+        <div class="kpi-label" data-i18n="a_active_now">Aktywnych teraz</div>
+        <div class="kpi-trend" style="color:var(--green)">● Online</div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="admin-charts-row">
+      <!-- Revenue Chart -->
+      <div class="admin-panel chart-panel">
+        <div class="wallet-panel-title"><span>📈</span><span data-i18n="a_chart_revenue">Przychód miesięczny (€)</span></div>
+        <div class="bar-chart" id="bar-chart"></div>
+        <div class="bar-labels" id="bar-labels"></div>
+      </div>
+      <!-- Top Tasks -->
+      <div class="admin-panel">
+        <div class="wallet-panel-title"><span>🏆</span><span data-i18n="a_top_tasks">Najpopularniejsze zadania</span></div>
+        <div class="top-tasks-list" id="top-tasks-list"></div>
+      </div>
+    </div>
+
+    <!-- BOTTOM ROW -->
+    <div class="admin-bottom-row">
+
+      <!-- Task Manager -->
+      <div class="admin-panel" style="flex:2">
+        <div class="wallet-panel-title" style="justify-content:space-between">
+          <span style="display:flex;align-items:center;gap:10px"><span>📋</span><span data-i18n="a_manage_tasks">Zarządzaj zadaniami</span></span>
+          <input class="search-input" style="width:160px" type="text" id="admin-search" placeholder="🔍 Szukaj..." oninput="filterAdminTasks(this.value)">
+        </div>
+        <div class="admin-task-table" id="admin-task-table"></div>
+      </div>
+
+      <!-- Company Partners -->
+      <div class="admin-panel" style="flex:1">
+        <div class="wallet-panel-title"><span>🤝</span><span data-i18n="a_partners">Partnerzy</span></div>
+        <div class="partner-list" id="partner-list"></div>
+        <button class="withdraw-btn" style="margin-top:16px;font-size:13px" onclick="showAddPartnerToast()" data-i18n="a_add_partner">+ Dodaj partnera</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ADD TASK MODAL -->
+  <div id="add-task-modal" class="modal-overlay" onclick="closeAddModal(event)">
+    <div class="modal-box" style="max-width:480px">
+      <button class="modal-close" onclick="closeAddTaskModal()">✕</button>
+      <div style="font-size:36px;margin-bottom:12px">📝</div>
+      <div class="modal-company" data-i18n="a_new_task">NOWE ZADANIE</div>
+      <div class="modal-title" data-i18n="a_add_task_title">Dodaj zadanie do platformy</div>
+      <div class="form-group"><label class="form-label" data-i18n="a_task_name">Nazwa zadania</label><input class="wallet-input" id="nt-title" data-i18n-placeholder="a_task_name_ph" placeholder="np. Testowanie aplikacji iOS"></div>
+      <div class="form-group"><label class="form-label" data-i18n="a_task_company">Firma</label><input class="wallet-input" id="nt-company" placeholder="np. Scale AI"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label class="form-label" data-i18n="a_task_reward">Wynagrodzenie (€)</label><input class="wallet-input" id="nt-reward" type="number" placeholder="10.00"></div>
+        <div class="form-group"><label class="form-label" data-i18n="a_task_time">Czas</label><input class="wallet-input" id="nt-time" placeholder="30 min"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group">
+          <label class="form-label" data-i18n="a_task_diff">Trudność</label>
+          <select class="wallet-input" id="nt-diff" style="cursor:pointer">
+            <option value="easy" data-i18n="t_easy">Łatwe</option>
+            <option value="medium" data-i18n="t_medium">Średnie</option>
+            <option value="hard" data-i18n="t_hard">Trudne</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label" data-i18n="a_task_cat">Kategoria</label><input class="wallet-input" id="nt-cat" placeholder="AI/ML, QA, Data..."></div>
+      </div>
+      <button class="modal-accept" onclick="submitNewTask()" data-i18n="a_publish">Opublikuj zadanie →</button>
+    </div>
+  </div>
+
+  <div id="admin-toast" class="toast"></div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>⚡ TaskForge</span> &nbsp;·&nbsp;
+  <span data-i18n="footer_copy">© 2026 Wszelkie prawa zastrzeżone</span> &nbsp;·&nbsp;
+  <a href="#" data-i18n="footer_privacy">Polityka prywatności</a> &nbsp;·&nbsp;
+  <a href="#" data-i18n="footer_terms">Regulamin</a>
+</footer>
+
+<script>
+// ─── i18n ───────────────────────────────────────────────
+const TRANSLATIONS = {
+  pl: {
+    nav_home:"Strona główna", nav_tasks:"Zadania", nav_wallet:"Portfel", nav_admin:"Admin",
+    hero_title:"Zarabiaj na<br><span class='accent'>wykonywaniu zadań</span>",
+    hero_sub:"Dołącz do tysięcy użytkowników którzy zarabiają realną gotówkę i krypto wypełniając zadania od globalnych firm.",
+    hero_cta1:"Zacznij zarabiać →", hero_cta2:"Dla firm",
+    stat1:"Aktywnych użytkowników", stat2:"Wypłaconych", stat3:"Dostępnych zadań", stat4:"Firm partnerskich",
+    how_label:"Jak to działa", how_title:"Trzy kroki do zarobku",
+    step1_title:"Wybierz zadanie", step1_desc:"Przeglądaj setki zadań od sprawdzonych firm. Filtruj po kategorii, trudności i wynagrodzeniu.",
+    step2_title:"Wykonaj i wyślij", step2_desc:"Zrealizuj zadanie w wyznaczonym czasie. Nasz system automatycznie weryfikuje jakość.",
+    step3_title:"Otrzymaj płatność", step3_desc:"Wypłać zarobki przelewem, PayPal lub krypto — bezpośrednio na Twój portfel.",
+    companies_label:"Partnerzy", companies_title:"Firmy które płacą za zadania",
+    pay_label:"Płatności", pay_title:"Wypłać jak chcesz",
+    pay_trad:"Tradycyjne metody", pay_crypto:"Kryptowaluty",
+    coming_tasks:"Panel zadań — Etap 2", coming_wallet:"Portfel & Płatności — Etap 3", coming_admin:"Dashboard Admina — Etap 4",
+    coming_soon:"Wkrótce dostępne",
+    footer_copy:"© 2026 Wszelkie prawa zastrzeżone", footer_privacy:"Polityka prywatności", footer_terms:"Regulamin"
+  },
+  en: {
+    nav_home:"Home", nav_tasks:"Tasks", nav_wallet:"Wallet", nav_admin:"Admin",
+    hero_title:"Earn Money<br><span class='accent'>Completing Tasks</span>",
+    hero_sub:"Join thousands of users earning real cash and crypto by completing tasks for global companies.",
+    hero_cta1:"Start Earning →", hero_cta2:"For Companies",
+    stat1:"Active Users", stat2:"Paid Out", stat3:"Available Tasks", stat4:"Partner Companies",
+    how_label:"How It Works", how_title:"Three Steps to Earning",
+    step1_title:"Pick a Task", step1_desc:"Browse hundreds of tasks from vetted companies. Filter by category, difficulty and reward.",
+    step2_title:"Complete & Submit", step2_desc:"Finish the task within the allotted time. Our system automatically verifies quality.",
+    step3_title:"Get Paid", step3_desc:"Withdraw earnings via bank transfer, PayPal or crypto — directly to your wallet.",
+    companies_label:"Partners", companies_title:"Companies That Pay for Tasks",
+    pay_label:"Payments", pay_title:"Get Paid Your Way",
+    pay_trad:"Traditional Methods", pay_crypto:"Cryptocurrencies",
+    coming_tasks:"Task Panel — Stage 2", coming_wallet:"Wallet & Payments — Stage 3", coming_admin:"Admin Dashboard — Stage 4",
+    coming_soon:"Coming soon",
+    footer_copy:"© 2026 All rights reserved", footer_privacy:"Privacy Policy", footer_terms:"Terms of Service"
+  },
+  de: {
+    nav_home:"Startseite", nav_tasks:"Aufgaben", nav_wallet:"Wallet", nav_admin:"Admin",
+    hero_title:"Geld verdienen mit<br><span class='accent'>Aufgaben erledigen</span>",
+    hero_sub:"Schließen Sie sich Tausenden von Nutzern an, die echtes Geld und Krypto durch das Erledigen von Aufgaben verdienen.",
+    hero_cta1:"Jetzt verdienen →", hero_cta2:"Für Unternehmen",
+    stat1:"Aktive Nutzer", stat2:"Ausgezahlt", stat3:"Verfügbare Aufgaben", stat4:"Partnerunternehmen",
+    how_label:"So funktioniert es", how_title:"Drei Schritte zum Verdienst",
+    step1_title:"Aufgabe wählen", step1_desc:"Hunderte Aufgaben von geprüften Unternehmen. Nach Kategorie, Schwierigkeit und Vergütung filtern.",
+    step2_title:"Ausführen & Einreichen", step2_desc:"Aufgabe in der vorgegebenen Zeit erledigen. Unser System prüft automatisch die Qualität.",
+    step3_title:"Bezahlt werden", step3_desc:"Verdienst per Banküberweisung, PayPal oder Krypto — direkt auf Ihr Wallet.",
+    companies_label:"Partner", companies_title:"Unternehmen, die für Aufgaben zahlen",
+    pay_label:"Zahlungen", pay_title:"Bezahlt werden, wie Sie möchten",
+    pay_trad:"Traditionelle Methoden", pay_crypto:"Kryptowährungen",
+    coming_tasks:"Aufgaben-Panel — Stufe 2", coming_wallet:"Wallet & Zahlungen — Stufe 3", coming_admin:"Admin-Dashboard — Stufe 4",
+    coming_soon:"Demnächst verfügbar",
+    footer_copy:"© 2026 Alle Rechte vorbehalten", footer_privacy:"Datenschutz", footer_terms:"Nutzungsbedingungen"
+  },
+  th: {
+    nav_home:"หน้าหลัก", nav_tasks:"งาน", nav_wallet:"กระเป๋า", nav_admin:"แอดมิน",
+    hero_title:"หาเงิน<br><span class='accent'>จากการทำงาน</span>",
+    hero_sub:"เข้าร่วมกับผู้ใช้หลายพันคนที่หาเงินสดและคริปโตจากการทำงานให้บริษัทระดับโลก",
+    hero_cta1:"เริ่มหาเงิน →", hero_cta2:"สำหรับบริษัท",
+    stat1:"ผู้ใช้งานที่ใช้งาน", stat2:"จ่ายออกแล้ว", stat3:"งานที่มีอยู่", stat4:"บริษัทพาร์ทเนอร์",
+    how_label:"วิธีการทำงาน", how_title:"สามขั้นตอนสู่รายได้",
+    step1_title:"เลือกงาน", step1_desc:"เลือกดูงานหลายร้อยรายการจากบริษัทที่ผ่านการตรวจสอบ กรองตามหมวดหมู่และรางวัล",
+    step2_title:"ทำและส่ง", step2_desc:"ทำงานให้เสร็จภายในเวลาที่กำหนด ระบบของเราตรวจสอบคุณภาพโดยอัตโนมัติ",
+    step3_title:"รับเงิน", step3_desc:"ถอนรายได้ผ่านโอนเงิน, PayPal หรือคริปโต — ตรงสู่กระเป๋าของคุณ",
+    companies_label:"พาร์ทเนอร์", companies_title:"บริษัทที่จ่ายเงินสำหรับงาน",
+    pay_label:"การชำระเงิน", pay_title:"รับเงินในแบบที่คุณต้องการ",
+    pay_trad:"วิธีดั้งเดิม", pay_crypto:"คริปโตเคอร์เรนซี",
+    coming_tasks:"แผงงาน — ขั้นตอนที่ 2", coming_wallet:"กระเป๋า — ขั้นตอนที่ 3", coming_admin:"แดชบอร์ดแอดมิน — ขั้นตอนที่ 4",
+    coming_soon:"เร็วๆ นี้",
+    footer_copy:"© 2026 สงวนลิขสิทธิ์", footer_privacy:"นโยบายความเป็นส่วนตัว", footer_terms:"ข้อกำหนดการใช้งาน"
+  }
+};
+
+let currentLang = 'pl';
+
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const t = TRANSLATIONS[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) el.innerHTML = t[key];
+  });
+}
+
+// ─── Navigation ────────────────────────────────────────
+function showSection(id, btn) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('visible'));
+  document.getElementById(id).classList.add('visible');
+  document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-link').forEach(b => {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${id}'`)) b.classList.add('active');
+    });
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+// ─── TASKS DATA ────────────────────────────────────────
+const TASKS = [
+  { id:1, logo:'🤖', company:'Scale AI', reward:12.00, time:'30 min', difficulty:'medium', category:'AI/ML',
+    title:{pl:'Oznaczanie danych AI',en:'AI Data Labeling',de:'KI-Datenbeschriftung',th:'ติดป้ายข้อมูล AI'},
+    desc:{pl:'Opisz i oznacz zdjęcia dla modelu AI. Wymagana dokładność powyżej 95%. Zadanie obejmuje 50 obrazów do oznaczenia zgodnie z podanymi kategoriami.',en:'Label and annotate images for an AI model. Required accuracy above 95%. Task includes 50 images to categorize per provided guidelines.',de:'Bilder für ein KI-Modell beschriften. Genauigkeit über 95% erforderlich. Aufgabe umfasst 50 Bilder.',th:'ติดป้ายและอธิบายรูปภาพสำหรับโมเดล AI ต้องการความแม่นยำสูงกว่า 95%'} },
+  { id:2, logo:'🧪', company:'Testlio', reward:8.50, time:'20 min', difficulty:'easy', category:'QA',
+    title:{pl:'Testowanie aplikacji mobilnej',en:'Mobile App Testing',de:'Mobile-App-Test',th:'ทดสอบแอปมือถือ'},
+    desc:{pl:'Przetestuj nową wersję aplikacji na Android. Sprawdź 10 kluczowych funkcji i zgłoś ewentualne błędy.',en:'Test the new Android app release. Check 10 key features and report any bugs found.',de:'Neue Android-App-Version testen. 10 Hauptfunktionen prüfen und Fehler melden.',th:'ทดสอบแอป Android เวอร์ชันใหม่ ตรวจสอบ 10 ฟีเจอร์หลักและรายงานบั๊ก'} },
+  { id:3, logo:'🎙️', company:'Rev.com', reward:18.00, time:'45 min', difficulty:'medium', category:'Data',
+    title:{pl:'Transkrypcja nagrania audio',en:'Audio Transcription',de:'Audio-Transkription',th:'ถอดเสียงเป็นข้อความ'},
+    desc:{pl:'Przepisz nagranie podcastu (20 min). Wymagana znajomość języka angielskiego. Formatowanie zgodnie z wytycznymi.',en:'Transcribe a 20-minute podcast recording. English proficiency required. Follow provided formatting guidelines.',de:'20-minütige Podcast-Aufnahme transkribieren. Englischkenntnisse erforderlich.',th:'ถอดเสียงพอดแคสต์ 20 นาที ต้องการความสามารถภาษาอังกฤษ'} },
+  { id:4, logo:'📊', company:'Toluna', reward:4.00, time:'8 min', difficulty:'easy', category:'Survey',
+    title:{pl:'Ankieta konsumencka',en:'Consumer Survey',de:'Verbraucherumfrage',th:'แบบสำรวจผู้บริโภค'},
+    desc:{pl:'Wypełnij ankietę dotyczącą nawyków zakupowych online. 15 pytań wielokrotnego wyboru.',en:'Complete a survey about online shopping habits. 15 multiple choice questions.',de:'Umfrage zu Online-Einkaufsgewohnheiten ausfüllen. 15 Multiple-Choice-Fragen.',th:'ตอบแบบสอบถามเกี่ยวกับพฤติกรรมการซื้อสินค้าออนไลน์ 15 ข้อ'} },
+  { id:5, logo:'🌐', company:'Welocalize', reward:15.00, time:'35 min', difficulty:'medium', category:'Language',
+    title:{pl:'Tłumaczenie zdań PL→EN',en:'Translation PL→EN',de:'Übersetzung PL→EN',th:'แปลภาษา PL→EN'},
+    desc:{pl:'Przetłumacz 30 zdań z polskiego na angielski dla systemu NLP. Wymagana natywna znajomość jednego z języków.',en:'Translate 30 sentences from Polish to English for an NLP system. Native proficiency in one language required.',de:'30 Sätze vom Polnischen ins Englische übersetzen. Muttersprachliche Kenntnisse erforderlich.',th:'แปล 30 ประโยคจากภาษาโปแลนด์เป็นภาษาอังกฤษ'} },
+  { id:6, logo:'🛡️', company:'Cogito Tech', reward:22.00, time:'60 min', difficulty:'hard', category:'AI/ML',
+    title:{pl:'Moderacja treści AI',en:'AI Content Moderation',de:'KI-Inhaltsmoderation',th:'กลั่นกรองเนื้อหา AI'},
+    desc:{pl:'Oceń i sklasyfikuj 200 postów pod kątem zgodności z polityką platformy. Wymaga skupienia i dobrego osądu.',en:'Review and classify 200 posts for platform policy compliance. Requires focus and good judgment.',de:'200 Beiträge auf Richtlinienkonformität prüfen. Konzentration und gutes Urteilsvermögen erforderlich.',th:'ตรวจสอบและจำแนก 200 โพสต์ตามนโยบายแพลตฟอร์ม'} },
+  { id:7, logo:'📍', company:'HERE Maps', reward:6.50, time:'15 min', difficulty:'easy', category:'Data',
+    title:{pl:'Weryfikacja adresów',en:'Address Verification',de:'Adressverifizierung',th:'ตรวจสอบที่อยู่'},
+    desc:{pl:'Sprawdź poprawność 25 adresów na mapie. Porównaj dane ze zdjęciami ulicznymi i zgłoś rozbieżności.',en:'Verify 25 addresses on a map. Compare data with street view images and report discrepancies.',de:'25 Adressen auf der Karte überprüfen. Daten mit Straßenansichten vergleichen.',th:'ตรวจสอบที่อยู่ 25 รายการบนแผนที่'} },
+  { id:8, logo:'⭐', company:'Bazaarvoice', reward:5.00, time:'10 min', difficulty:'easy', category:'Survey',
+    title:{pl:'Opinia o produkcie',en:'Product Review',de:'Produktbewertung',th:'รีวิวสินค้า'},
+    desc:{pl:'Napisz szczerą, szczegółową recenzję produktu który już posiadasz. Min. 150 słów.',en:'Write an honest, detailed review of a product you already own. Min. 150 words.',de:'Ehrliche, detaillierte Bewertung eines eigenen Produkts schreiben. Min. 150 Wörter.',th:'เขียนรีวิวสินค้าที่คุณมีอย่างซื่อสัตย์ อย่างน้อย 150 คำ'} },
+  { id:9, logo:'📝', company:'Appen', reward:28.00, time:'90 min', difficulty:'hard', category:'AI/ML',
+    title:{pl:'Ocena wyników wyszukiwarki',en:'Search Engine Evaluation',de:'Suchmaschinenauswertung',th:'ประเมินผลการค้นหา'},
+    desc:{pl:'Oceń trafność wyników wyszukiwania dla 40 zapytań. Wymaga krytycznego myślenia i znajomości internetu.',en:'Rate search result relevance for 40 queries. Requires critical thinking and internet familiarity.',de:'Relevanz der Suchergebnisse für 40 Abfragen bewerten.',th:'ประเมินความเกี่ยวข้องของผลการค้นหา 40 คำถาม'} },
+  { id:10, logo:'🎨', company:'Labelbox', reward:10.00, time:'25 min', difficulty:'medium', category:'AI/ML',
+    title:{pl:'Segmentacja obrazów',en:'Image Segmentation',de:'Bildsegmentierung',th:'แบ่งส่วนภาพ'},
+    desc:{pl:'Narysuj kontury obiektów na 20 zdjęciach dla modelu wizji komputerowej. Instrukcja dostarczona.',en:'Draw outlines around objects in 20 images for a computer vision model. Instructions provided.',de:'Konturen um Objekte in 20 Bildern zeichnen. Anleitung wird bereitgestellt.',th:'วาดโครงร่างรอบวัตถุในภาพ 20 รูปสำหรับโมเดล Computer Vision'} },
+  { id:11, logo:'🔊', company:'Speechify', reward:9.00, time:'20 min', difficulty:'easy', category:'Data',
+    title:{pl:'Nagranie próbek głosowych',en:'Voice Sample Recording',de:'Sprachproben aufnehmen',th:'บันทึกตัวอย่างเสียง'},
+    desc:{pl:'Nagraj 50 zdań po polsku dla systemu TTS. Wymagany cichy pokój i dobry mikrofon.',en:'Record 50 sentences in your language for a TTS system. Quiet room and decent mic required.',de:'50 Sätze für TTS-System aufnehmen. Ruhiger Raum und gutes Mikrofon erforderlich.',th:'บันทึก 50 ประโยคสำหรับระบบ TTS ต้องการห้องเงียบ'} },
+  { id:12, logo:'💬', company:'Defined.ai', reward:16.00, time:'40 min', difficulty:'medium', category:'Language',
+    title:{pl:'Tworzenie dialogów AI',en:'AI Dialogue Creation',de:'KI-Dialog erstellen',th:'สร้างบทสนทนา AI'},
+    desc:{pl:'Napisz 20 naturalne dialogi między człowiekiem a chatbotem na zadane tematy.',en:'Write 20 natural dialogues between a human and chatbot on given topics.',de:'20 natürliche Dialoge zwischen Mensch und Chatbot zu gegebenen Themen schreiben.',th:'เขียนบทสนทนา 20 บทระหว่างมนุษย์และแชทบอท'} },
+];
+
+let diffFilter = 'all';
+let catFilter = 'all';
+let searchQuery = '';
+const acceptedTasks = new Set();
+
+const TASK_TRANS = {
+  pl:{reward:'Nagroda',time:'Czas',diff:'Trudność',cat:'Kategoria',accept:'Przyjmij zadanie',accepted:'✓ Przyjęte',toast:'Zadanie przyjęte! Powodzenia 🚀',detail:'Szczegóły zadania'},
+  en:{reward:'Reward',time:'Time',diff:'Difficulty',cat:'Category',accept:'Accept Task',accepted:'✓ Accepted',toast:'Task accepted! Good luck 🚀',detail:'Task Details'},
+  de:{reward:'Vergütung',time:'Zeit',diff:'Schwierigkeit',cat:'Kategorie',accept:'Aufgabe annehmen',accepted:'✓ Angenommen',toast:'Aufgabe angenommen! Viel Erfolg 🚀',detail:'Aufgabendetails'},
+  th:{reward:'รางวัล',time:'เวลา',diff:'ความยาก',cat:'หมวดหมู่',accept:'รับงาน',accepted:'✓ รับแล้ว',toast:'รับงานแล้ว! โชคดี 🚀',detail:'รายละเอียดงาน'}
+};
+const DIFF_LABELS = {
+  pl:{easy:'Łatwe',medium:'Średnie',hard:'Trudne'},
+  en:{easy:'Easy',medium:'Medium',hard:'Hard'},
+  de:{easy:'Einfach',medium:'Mittel',hard:'Schwer'},
+  th:{easy:'ง่าย',medium:'ปานกลาง',hard:'ยาก'}
+};
+
+function filterTasks(val, btn) {
+  diffFilter = val;
+  document.querySelectorAll('.filter-group:first-child .filter-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderTasks();
+}
+function filterCat(val, btn) {
+  catFilter = val;
+  document.querySelectorAll('.filter-group:nth-child(2) .filter-btn').forEach(b => b.classList.remove('active','active-cat'));
+  if(btn) btn.classList.add('active-cat');
+  renderTasks();
+}
+function searchTasks(val) { searchQuery = val.toLowerCase(); renderTasks(); }
+
+function renderTasks() {
+  const grid = document.getElementById('tasks-grid');
+  const empty = document.getElementById('tasks-empty');
+  const tt = TASK_TRANS[currentLang];
+  const dl = DIFF_LABELS[currentLang];
+  let filtered = TASKS.filter(t => {
+    if(diffFilter !== 'all' && t.difficulty !== diffFilter) return false;
+    if(catFilter !== 'all' && t.category !== catFilter) return false;
+    if(searchQuery && !t.title[currentLang].toLowerCase().includes(searchQuery) && !t.company.toLowerCase().includes(searchQuery)) return false;
+    return true;
+  });
+  if(!filtered.length) { grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = filtered.map(t => `
+    <div class="task-card ${t.difficulty}" onclick="openTask(${t.id})">
+      <div class="tc-top">
+        <div class="tc-company">
+          <span class="tc-logo">${t.logo}</span>
+          <span class="tc-company-name">${t.company}</span>
+        </div>
+        <span class="tc-diff ${t.difficulty}">${dl[t.difficulty]}</span>
+      </div>
+      <div class="tc-title">${t.title[currentLang]}</div>
+      <div class="tc-meta">
+        <span class="tc-meta-item">⏱ ${t.time}</span>
+        <span class="tc-category">${t.category}</span>
+        ${acceptedTasks.has(t.id) ? '<span class="tc-meta-item" style="color:var(--green)">✓ '+tt.accepted+'</span>' : ''}
+      </div>
+      <div class="tc-footer">
+        <span class="tc-reward">€${t.reward.toFixed(2)}</span>
+        <button class="tc-btn" onclick="event.stopPropagation();openTask(${t.id})">${tt.accept} →</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openTask(id) {
+  const t = TASKS.find(x => x.id === id);
+  const tt = TASK_TRANS[currentLang];
+  const dl = DIFF_LABELS[currentLang];
+  const isAccepted = acceptedTasks.has(id);
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-logo">${t.logo}</div>
+    <div class="modal-company">${t.company}</div>
+    <div class="modal-title">${t.title[currentLang]}</div>
+    <div class="modal-details">
+      <div class="modal-detail"><div class="modal-detail-label">${tt.reward}</div><div class="modal-detail-val" style="color:var(--green)">€${t.reward.toFixed(2)}</div></div>
+      <div class="modal-detail"><div class="modal-detail-label">${tt.time}</div><div class="modal-detail-val">⏱ ${t.time}</div></div>
+      <div class="modal-detail"><div class="modal-detail-label">${tt.diff}</div><div class="modal-detail-val">${dl[t.difficulty]}</div></div>
+      <div class="modal-detail"><div class="modal-detail-label">${tt.cat}</div><div class="modal-detail-val">${t.category}</div></div>
+    </div>
+    <p class="modal-desc">${t.desc[currentLang]}</p>
+    <button class="modal-accept ${isAccepted?'accepted':''}" onclick="${isAccepted?'':'acceptTask('+id+')'}">${isAccepted?tt.accepted:tt.accept}</button>
+  `;
+  document.getElementById('task-modal').classList.add('open');
+}
+
+function acceptTask(id) {
+  acceptedTasks.add(id);
+  const t = TASKS.find(x => x.id === id);
+  const tt = TASK_TRANS[currentLang];
+  // update balance display
+  let bal = parseFloat(document.getElementById('user-balance').textContent.replace('€','')) + t.reward * 0.1;
+  document.getElementById('user-balance').textContent = '€' + bal.toFixed(2);
+  let done = parseInt(document.getElementById('user-done').textContent) + 1;
+  document.getElementById('user-done').textContent = done;
+  closeTaskModal();
+  showToast(tt.toast);
+  renderTasks();
+}
+
+function closeTaskModal() { document.getElementById('task-modal').classList.remove('open'); }
+function closeModal(e) { if(e.target === document.getElementById('task-modal')) closeTaskModal(); }
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// Re-render tasks when switching to tasks section
+const origShowSection = showSection;
+window.showSection = function(id, btn) {
+  origShowSection(id, btn);
+  if(id === 'tasks') renderTasks();
+};
+
+// i18n additions for tasks
+const taskI18n = {
+  pl:{tasks_label:'Dostępne zadania',tasks_title:'Wybierz zadanie i zarabiaj',t_balance:'Saldo',t_done:'Ukończone',t_rating:'Ocena',t_difficulty:'Trudność:',t_all:'Wszystkie',t_easy:'🟢 Łatwe',t_medium:'🟡 Średnie',t_hard:'🔴 Trudne',t_category:'Kategoria:',t_search:'Szukaj...',t_noresult:'Brak wyników. Zmień filtry.'},
+  en:{tasks_label:'Available Tasks',tasks_title:'Pick a Task and Earn',t_balance:'Balance',t_done:'Completed',t_rating:'Rating',t_difficulty:'Difficulty:',t_all:'All',t_easy:'🟢 Easy',t_medium:'🟡 Medium',t_hard:'🔴 Hard',t_category:'Category:',t_search:'Search...',t_noresult:'No results. Change filters.'},
+  de:{tasks_label:'Verfügbare Aufgaben',tasks_title:'Aufgabe wählen und verdienen',t_balance:'Guthaben',t_done:'Erledigt',t_rating:'Bewertung',t_difficulty:'Schwierigkeit:',t_all:'Alle',t_easy:'🟢 Einfach',t_medium:'🟡 Mittel',t_hard:'🔴 Schwer',t_category:'Kategorie:',t_search:'Suchen...',t_noresult:'Keine Ergebnisse.'},
+  th:{tasks_label:'งานที่มีอยู่',tasks_title:'เลือกงานและหาเงิน',t_balance:'ยอดเงิน',t_done:'เสร็จแล้ว',t_rating:'คะแนน',t_difficulty:'ความยาก:',t_all:'ทั้งหมด',t_easy:'🟢 ง่าย',t_medium:'🟡 ปานกลาง',t_hard:'🔴 ยาก',t_category:'หมวดหมู่:',t_search:'ค้นหา...',t_noresult:'ไม่พบผลลัพธ์'}
+};
+const origSetLang = setLang;
+window.setLang = function(lang, btn) {
+  origSetLang(lang, btn);
+  // merge task i18n
+  const t = taskI18n[lang];
+  Object.keys(t).forEach(k => {
+    document.querySelectorAll('[data-i18n="'+k+'"]').forEach(el => el.innerHTML = t[k]);
+    document.querySelectorAll('[data-i18n-placeholder="'+k+'"]').forEach(el => el.placeholder = t[k]);
+  });
+  if(document.getElementById('tasks').classList.contains('visible')) renderTasks();
+};
+
+// INIT
+window.setLang("pl", document.querySelector(".lang-btn.active"));
+
+// init tasks if page loads on tasks
+if(document.getElementById('tasks').classList.contains('visible')) renderTasks();
+
+// ─── WALLET JS ─────────────────────────────────────────
+const TX_DATA = [
+  { icon:'🤖', desc:{pl:'Oznaczanie danych AI',en:'AI Data Labeling',de:'KI-Datenbeschriftung',th:'ติดป้ายข้อมูล AI'}, amount:'+€12.00', type:'pos', date:'2026-05-18', status:'done' },
+  { icon:'🧪', desc:{pl:'Testowanie aplikacji',en:'App Testing',de:'App-Test',th:'ทดสอบแอป'}, amount:'+€8.50', type:'pos', date:'2026-05-17', status:'done' },
+  { icon:'💸', desc:{pl:'Wypłata USDT (Polygon)',en:'USDT Withdrawal',de:'USDT-Auszahlung',th:'ถอน USDT'}, amount:'-€25.00', type:'neg', date:'2026-05-16', status:'done' },
+  { icon:'🎙️', desc:{pl:'Transkrypcja audio',en:'Audio Transcription',de:'Transkription',th:'ถอดเสียง'}, amount:'+€18.00', type:'pos', date:'2026-05-15', status:'done' },
+  { icon:'📊', desc:{pl:'Ankieta konsumencka',en:'Consumer Survey',de:'Verbraucherumfrage',th:'แบบสำรวจ'}, amount:'+€4.00', type:'pos', date:'2026-05-14', status:'done' },
+  { icon:'🏛️', desc:{pl:'Przelew SEPA',en:'SEPA Transfer',de:'SEPA-Überweisung',th:'โอนเงิน SEPA'}, amount:'-€30.00', type:'neg', date:'2026-05-13', status:'done' },
+  { icon:'🌐', desc:{pl:'Tłumaczenie zdań',en:'Sentence Translation',de:'Satzübersetzung',th:'แปลประโยค'}, amount:'+€15.00', type:'pos', date:'2026-05-12', status:'done' },
+  { icon:'🤖', desc:{pl:'Segmentacja obrazów',en:'Image Segmentation',de:'Bildsegmentierung',th:'แบ่งส่วนภาพ'}, amount:'+€10.00', type:'pos', date:'2026-05-11', status:'pending' },
+  { icon:'🛡️', desc:{pl:'Moderacja treści',en:'Content Moderation',de:'Inhaltsmoderation',th:'กลั่นกรองเนื้อหา'}, amount:'+€22.00', type:'pos', date:'2026-05-10', status:'pending' },
+];
+
+const STATUS_LABELS = {
+  pl:{done:'Ukończone',pending:'Oczekuje'},
+  en:{done:'Completed',pending:'Pending'},
+  de:{done:'Abgeschlossen',pending:'Ausstehend'},
+  th:{done:'เสร็จสิ้น',pending:'รอดำเนินการ'}
+};
+
+let connectedWallet = null;
+let selectedCoin = 'USDT';
+
+const WALLET_COINS = {
+  'MetaMask': ['ETH','USDT','USDC'],
+  'Trust Wallet': ['BTC','BNB','ETH'],
+  'Coinbase': ['ETH','USDC','SOL'],
+  'Phantom': ['SOL','USDC']
+};
+const WALLET_FEES = {
+  ETH:'⛽ Gas fee: ~$2.10 · Ethereum', USDT:'⛽ Gas fee: ~$0.80 · Polygon',
+  USDC:'⛽ Gas fee: ~$0.40 · Polygon', BTC:'⛽ Network fee: ~$1.50 · Bitcoin',
+  BNB:'⛽ Gas fee: ~$0.10 · BSC', SOL:'⛽ Fee: ~$0.001 · Solana'
+};
+
+function renderTxList() {
+  const sl = STATUS_LABELS[currentLang] || STATUS_LABELS.pl;
+  document.getElementById('tx-list').innerHTML = TX_DATA.map(tx => `
+    <div class="tx-item">
+      <div class="tx-icon">${tx.icon}</div>
+      <div class="tx-info">
+        <div class="tx-desc">${tx.desc[currentLang] || tx.desc.pl}</div>
+        <div class="tx-date">${tx.date}</div>
+        <span class="tx-badge ${tx.status}">${sl[tx.status]}</span>
+      </div>
+      <div class="tx-amount ${tx.type}">${tx.amount}</div>
+    </div>
+  `).join('');
+}
+
+function switchMethod(method, btn) {
+  document.querySelectorAll('.method-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.method-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('method-' + method).classList.add('active');
+}
+
+function connectWallet(name, icon, defaultCoin) {
+  // Simulate connection
+  connectedWallet = name;
+  selectedCoin = defaultCoin;
+  document.querySelectorAll('.crypto-wallet-btn').forEach(b => b.classList.remove('connected'));
+  const idMap = {'MetaMask':'metamask','Trust Wallet':'trust','Coinbase':'coinbase','Phantom':'phantom'};
+  const btn = document.getElementById('cwb-' + idMap[name]);
+  if(btn) btn.classList.add('connected');
+
+  // fake address
+  const addr = '0x' + Math.random().toString(16).slice(2,6).toUpperCase() + '...' + Math.random().toString(16).slice(2,6).toUpperCase();
+  document.getElementById('crypto-addr').value = addr;
+  document.getElementById('connected-wallet-info').textContent = icon + ' ' + name + ' połączony · ' + addr;
+  document.getElementById('crypto-form').style.display = 'block';
+
+  // coins
+  const coins = WALLET_COINS[name] || ['ETH'];
+  document.getElementById('coin-select').innerHTML = coins.map(c =>
+    `<button class="coin-btn ${c===selectedCoin?'active':''}" onclick="selectCoin('${c}',this)">${c}</button>`
+  ).join('');
+  document.getElementById('fee-note').textContent = WALLET_FEES[selectedCoin] || '';
+
+  // show address bar
+  document.getElementById('wallet-addr-bar').style.display = 'flex';
+  document.getElementById('wallet-addr-text').textContent = addr;
+
+  showWalletToast('🦊 ' + name + ' połączony!');
+}
+
+function selectCoin(coin, btn) {
+  selectedCoin = coin;
+  document.querySelectorAll('.coin-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('fee-note').textContent = WALLET_FEES[coin] || '';
+}
+
+function disconnectWallet() {
+  connectedWallet = null;
+  document.querySelectorAll('.crypto-wallet-btn').forEach(b => b.classList.remove('connected'));
+  document.getElementById('crypto-form').style.display = 'none';
+  document.getElementById('wallet-addr-bar').style.display = 'none';
+  showWalletToast('Portfel rozłączony');
+}
+
+function setMax(inputId, max) { document.getElementById(inputId).value = max; }
+
+function doWithdraw(type) {
+  const W_MSGS = {
+    pl: {ok:'✅ Wypłata zlecona! Środki wkrótce dotrą.', err:'Podaj kwotę i dane odbiorcy.'},
+    en: {ok:'✅ Withdrawal sent! Funds will arrive soon.', err:'Enter amount and destination.'},
+    de: {ok:'✅ Auszahlung beauftragt! Geld kommt bald.', err:'Betrag und Empfänger angeben.'},
+    th: {ok:'✅ ส่งคำขอถอนเงินแล้ว!', err:'กรุณากรอกจำนวนเงินและปลายทาง'}
+  };
+  const msgs = W_MSGS[currentLang] || W_MSGS.pl;
+  let amount, dest;
+  if(type === 'fiat') {
+    amount = document.getElementById('fiat-amount').value;
+    dest = document.getElementById('fiat-dest').value;
+  } else {
+    amount = document.getElementById('crypto-amount').value;
+    dest = document.getElementById('crypto-addr').value;
+  }
+  if(!amount || !dest) { showWalletToast('⚠️ ' + msgs.err, '#ffd166'); return; }
+
+  // Add to history
+  const icon = type === 'fiat' ? '🏛️' : (selectedCoin === 'BTC' ? '🟠' : '🔷');
+  const desc = {pl:'Wypłata '+amount+'€', en:'Withdrawal '+amount+'€', de:'Auszahlung '+amount+'€', th:'ถอน '+amount+'€'};
+  TX_DATA.unshift({ icon, desc, amount: '-€'+parseFloat(amount).toFixed(2), type:'neg', date: new Date().toISOString().slice(0,10), status:'done' });
+  renderTxList();
+
+  // update balance
+  const newBal = Math.max(0, 43.50 - parseFloat(amount)).toFixed(2);
+  document.getElementById('w-total-balance').textContent = '€ ' + newBal;
+  document.getElementById('fiat-amount').value = '';
+  document.getElementById('crypto-amount').value = '';
+  showWalletToast(msgs.ok);
+}
+
+function showWalletToast(msg, bg) {
+  const el = document.getElementById('wallet-toast');
+  el.textContent = msg;
+  el.style.background = bg || 'var(--green)';
+  el.style.color = bg ? '#080810' : '#080810';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// Patch showSection to render wallet
+const _ss2 = window.showSection;
+window.showSection = function(id, btn) {
+  _ss2(id, btn);
+  if(id === 'wallet') { renderTxList(); }
+};
+
+// Patch setLang for wallet
+const _sl2 = window.setLang;
+window.setLang = function(lang, btn) {
+  _sl2(lang, btn);
+  if(document.getElementById('wallet').classList.contains('visible')) renderTxList();
+};
+
+const W_I18N = {
+  pl:{w_label:'Portfel & Płatności',w_title:'Twoje zarobki',w_total:'Saldo całkowite',w_available:'Dostępne do wypłaty',w_pending:'Oczekuje',w_pending_sub:'Weryfikacja zadań',w_earned_month:'Zarobiono (maj)',w_total_paid:'Łącznie wypłacono',w_all_time:'Od początku',w_disconnect:'Rozłącz',w_withdraw:'Wypłać środki',w_fiat:'🏦 Tradycyjne',w_crypto:'₿ Krypto',w_sepa_desc:'1–2 dni · min. €10',w_paypal_desc:'Natychmiastowy · min. €5',w_wise_desc:'Natychmiastowy · min. €1',w_amount:'Kwota (€)',w_dest:'Dane odbiorcy',w_dest_placeholder:'IBAN / email PayPal / Wise handle',w_withdraw_btn:'Wypłać środki →',w_coin:'Token',w_wallet_addr:'Adres portfela',w_send_crypto:'Wyślij krypto →',w_history:'Historia transakcji',w_commission_title:'Twoja prowizja jako właściciel',w_commission_desc:'Zarabiasz 10% od każdego zadania na platformie'},
+  en:{w_label:'Wallet & Payments',w_title:'Your Earnings',w_total:'Total Balance',w_available:'Available to withdraw',w_pending:'Pending',w_pending_sub:'Task verification',w_earned_month:'Earned (May)',w_total_paid:'Total Paid Out',w_all_time:'All time',w_disconnect:'Disconnect',w_withdraw:'Withdraw Funds',w_fiat:'🏦 Traditional',w_crypto:'₿ Crypto',w_sepa_desc:'1–2 days · min. €10',w_paypal_desc:'Instant · min. €5',w_wise_desc:'Instant · min. €1',w_amount:'Amount (€)',w_dest:'Recipient Details',w_dest_placeholder:'IBAN / PayPal email / Wise handle',w_withdraw_btn:'Withdraw Funds →',w_coin:'Token',w_wallet_addr:'Wallet Address',w_send_crypto:'Send Crypto →',w_history:'Transaction History',w_commission_title:'Your Owner Commission',w_commission_desc:'You earn 10% of every task completed on the platform'},
+  de:{w_label:'Wallet & Zahlungen',w_title:'Ihre Einnahmen',w_total:'Gesamtguthaben',w_available:'Verfügbar zur Auszahlung',w_pending:'Ausstehend',w_pending_sub:'Aufgabenprüfung',w_earned_month:'Verdient (Mai)',w_total_paid:'Gesamt ausgezahlt',w_all_time:'Seit Beginn',w_disconnect:'Trennen',w_withdraw:'Auszahlen',w_fiat:'🏦 Traditionell',w_crypto:'₿ Krypto',w_sepa_desc:'1–2 Tage · min. €10',w_paypal_desc:'Sofort · min. €5',w_wise_desc:'Sofort · min. €1',w_amount:'Betrag (€)',w_dest:'Empfängerdaten',w_dest_placeholder:'IBAN / PayPal-E-Mail / Wise Handle',w_withdraw_btn:'Auszahlen →',w_coin:'Token',w_wallet_addr:'Wallet-Adresse',w_send_crypto:'Krypto senden →',w_history:'Transaktionsverlauf',w_commission_title:'Ihre Eigentümer-Provision',w_commission_desc:'Sie verdienen 10% jeder abgeschlossenen Aufgabe'},
+  th:{w_label:'กระเป๋าและการชำระเงิน',w_title:'รายได้ของคุณ',w_total:'ยอดคงเหลือทั้งหมด',w_available:'พร้อมถอน',w_pending:'รอดำเนินการ',w_pending_sub:'ตรวจสอบงาน',w_earned_month:'รายได้ (พ.ค.)',w_total_paid:'จ่ายออกทั้งหมด',w_all_time:'ตลอดเวลา',w_disconnect:'ยกเลิกการเชื่อมต่อ',w_withdraw:'ถอนเงิน',w_fiat:'🏦 แบบดั้งเดิม',w_crypto:'₿ คริปโต',w_sepa_desc:'1–2 วัน · ขั้นต่ำ €10',w_paypal_desc:'ทันที · ขั้นต่ำ €5',w_wise_desc:'ทันที · ขั้นต่ำ €1',w_amount:'จำนวน (€)',w_dest:'ข้อมูลผู้รับ',w_dest_placeholder:'IBAN / อีเมล PayPal / Wise',w_withdraw_btn:'ถอนเงิน →',w_coin:'โทเคน',w_wallet_addr:'ที่อยู่กระเป๋า',w_send_crypto:'ส่งคริปโต →',w_history:'ประวัติธุรกรรม',w_commission_title:'ค่าคอมมิชชันเจ้าของ',w_commission_desc:'คุณได้รับ 10% จากทุกงานบนแพลตฟอร์ม'}
+};
+
+// Merge W_I18N into setLang patch
+const _sl3 = window.setLang;
+window.setLang = function(lang, btn) {
+  _sl3(lang, btn);
+  const t = W_I18N[lang] || W_I18N.pl;
+  Object.keys(t).forEach(k => {
+    document.querySelectorAll('[data-i18n="'+k+'"]').forEach(el => el.innerHTML = t[k]);
+    document.querySelectorAll('[data-i18n-placeholder="'+k+'"]').forEach(el => el.placeholder = t[k]);
+  });
+};
+
+// ── ADMIN JS ───────────────────────────────────────────
+const REVENUE_DATA = [
+  {month:'Sty',val:310},{month:'Lut',val:290},{month:'Mar',val:420},{month:'Kwi',val:510},
+  {month:'Maj',val:847},{month:'Cze',val:0},{month:'Lip',val:0},{month:'Sie',val:0}
+];
+const PARTNER_DATA = [
+  {icon:'🤖',name:'Scale AI',tasks:312},{icon:'🧪',name:'Testlio',tasks:198},
+  {icon:'🎙️',name:'Rev.com',tasks:175},{icon:'📊',name:'Toluna',tasks:267},
+  {icon:'🌐',name:'Welocalize',tasks:143},{icon:'🛡️',name:'Cogito Tech',tasks:89},
+  {icon:'📍',name:'HERE Maps',tasks:203},{icon:'⭐',name:'Bazaarvoice',tasks:460}
+];
+const TOP_TASKS_DATA = [
+  {name:'AI Data Labeling',count:312,pct:100},
+  {name:'Consumer Survey',count:267,pct:86},
+  {name:'Address Verification',count:203,pct:65},
+  {name:'App Testing',count:198,pct:63},
+  {name:'Audio Transcription',count:175,pct:56}
+];
+
+let adminTaskList = [...(typeof TASKS !== 'undefined' ? TASKS : [])];
+
+function renderAdminDashboard() {
+  renderBarChart();
+  renderTopTasks();
+  renderAdminTasks();
+  renderPartners();
+}
+
+function renderBarChart() {
+  const max = Math.max(...REVENUE_DATA.map(d => d.val), 1);
+  document.getElementById('bar-chart').innerHTML = REVENUE_DATA.map(d => `
+    <div class="bar-wrap">
+      <span class="bar-val">${d.val ? '€'+d.val : ''}</span>
+      <div class="bar" style="height:${d.val ? Math.round((d.val/max)*100) : 2}%;${d.val===847?'background:var(--green);border-color:var(--green);':''}" title="${d.month}: €${d.val}"></div>
+    </div>
+  `).join('');
+  document.getElementById('bar-labels').innerHTML = REVENUE_DATA.map(d =>
+    `<span class="bar-label" style="${d.val===847?'color:var(--green);font-weight:700':''}">${d.month}</span>`
+  ).join('');
+}
+
+function renderTopTasks() {
+  document.getElementById('top-tasks-list').innerHTML = TOP_TASKS_DATA.map((t,i) => `
+    <div class="top-task-row">
+      <span class="top-task-rank">#${i+1}</span>
+      <div style="flex:1">
+        <div class="top-task-name">${t.name}</div>
+        <div class="top-task-bar"><div class="top-task-bar-fill" style="width:${t.pct}%"></div></div>
+      </div>
+      <span class="top-task-count">${t.count} zadań</span>
+    </div>
+  `).join('');
+}
+
+function renderAdminTasks(filter='') {
+  const A_HDR = {pl:['Zadanie','Firma','Nagroda','Trudność','Akcje'],en:['Task','Company','Reward','Difficulty','Actions'],de:['Aufgabe','Unternehmen','Vergütung','Schwierigkeit','Aktionen'],th:['งาน','บริษัท','รางวัล','ความยาก','การดำเนินการ']};
+  const hdr = A_HDR[currentLang] || A_HDR.pl;
+  const DIFF_COL = {easy:'var(--green)',medium:'#ffd166',hard:'#ff6b6b'};
+  const DL = DIFF_LABELS[currentLang] || DIFF_LABELS.pl;
+  const filtered = adminTaskList.filter(t =>
+    !filter || t.title[currentLang].toLowerCase().includes(filter) || t.company.toLowerCase().includes(filter)
+  );
+  document.getElementById('admin-task-table').innerHTML =
+    `<div class="admin-task-row header">${hdr.map(h=>`<span>${h}</span>`).join('')}</div>` +
+    filtered.map(t => `
+      <div class="admin-task-row">
+        <span class="atr-name">${t.logo} ${t.title[currentLang]}</span>
+        <span style="color:var(--muted);font-size:12px">${t.company}</span>
+        <span class="atr-reward">€${t.reward.toFixed(2)}</span>
+        <span style="color:${DIFF_COL[t.difficulty]};font-size:12px;font-weight:700">${DL[t.difficulty]}</span>
+        <div class="atr-actions">
+          <button class="atr-btn" onclick="editTask(${t.id})">✏️</button>
+          <button class="atr-btn del" onclick="deleteAdminTask(${t.id})">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+}
+
+function renderPartners() {
+  document.getElementById('partner-list').innerHTML = PARTNER_DATA.map(p => `
+    <div class="partner-row">
+      <span class="partner-icon">${p.icon}</span>
+      <span class="partner-name">${p.name}</span>
+      <span class="partner-tasks">${p.tasks} zadań</span>
+      <span class="partner-status"></span>
+    </div>
+  `).join('');
+}
+
+function filterAdminTasks(val) { renderAdminTasks(val.toLowerCase()); }
+
+function deleteAdminTask(id) {
+  adminTaskList = adminTaskList.filter(t => t.id !== id);
+  renderAdminTasks();
+  showAdminToast('🗑️ Zadanie usunięte');
+  document.getElementById('kpi-tasks-done').textContent = (1847 - (TASKS.length - adminTaskList.length)).toLocaleString();
+}
+
+function editTask(id) { showAdminToast('✏️ Edycja zadania #' + id + ' — wkrótce'); }
+
+function showAddTaskModal() { document.getElementById('add-task-modal').classList.add('open'); }
+function closeAddTaskModal() { document.getElementById('add-task-modal').classList.remove('open'); }
+function closeAddModal(e) { if(e.target === document.getElementById('add-task-modal')) closeAddTaskModal(); }
+
+function submitNewTask() {
+  const title = document.getElementById('nt-title').value.trim();
+  const company = document.getElementById('nt-company').value.trim() || 'Custom';
+  const reward = parseFloat(document.getElementById('nt-reward').value) || 10;
+  const time = document.getElementById('nt-time').value.trim() || '30 min';
+  const diff = document.getElementById('nt-diff').value;
+  const cat = document.getElementById('nt-cat').value.trim() || 'Custom';
+  if(!title) { showAdminToast('⚠️ Podaj nazwę zadania', '#ffd166'); return; }
+  const id = Date.now();
+  const newT = { id, logo:'📌', company, reward, time, difficulty:diff, category:cat,
+    title:{pl:title,en:title,de:title,th:title},
+    desc:{pl:'Nowe zadanie: '+title,en:'New task: '+title,de:'Neue Aufgabe: '+title,th:'งานใหม่: '+title}
+  };
+  adminTaskList.push(newT);
+  if(typeof TASKS !== 'undefined') TASKS.push(newT);
+  renderAdminTasks();
+  // update kpis
+  document.getElementById('kpi-tasks-done').textContent = (1847 + adminTaskList.length - TASKS.length + 1).toLocaleString();
+  closeAddTaskModal();
+  showAdminToast('✅ Zadanie opublikowane!');
+  ['nt-title','nt-company','nt-reward','nt-time','nt-cat'].forEach(id => document.getElementById(id).value = '');
+}
+
+function showAddPartnerToast() { showAdminToast('🤝 Formularz partnera — wkrótce dostępny'); }
+
+function showAdminToast(msg, bg) {
+  const el = document.getElementById('admin-toast');
+  el.textContent = msg; el.style.background = bg || 'var(--green)';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+const A_I18N = {
+  pl:{a_label:'Panel administratora',a_title:'Dashboard właściciela',a_live:'Na żywo',a_add_task:'+ Dodaj zadanie',a_revenue:'Przychód platformy (maj)',a_commission:'Twoja prowizja (10%)',a_users:'Zarejestrowani użytkownicy',a_tasks_done:'Zadań ukończonych (maj)',a_active_now:'Aktywnych teraz',a_chart_revenue:'Przychód miesięczny (€)',a_top_tasks:'Najpopularniejsze zadania',a_manage_tasks:'Zarządzaj zadaniami',a_partners:'Partnerzy',a_add_partner:'+ Dodaj partnera',a_new_task:'NOWE ZADANIE',a_add_task_title:'Dodaj zadanie do platformy',a_task_name:'Nazwa zadania',a_task_name_ph:'np. Testowanie aplikacji iOS',a_task_company:'Firma',a_task_reward:'Wynagrodzenie (€)',a_task_time:'Czas',a_task_diff:'Trudność',a_task_cat:'Kategoria',a_publish:'Opublikuj zadanie →'},
+  en:{a_label:'Admin Panel',a_title:'Owner Dashboard',a_live:'Live',a_add_task:'+ Add Task',a_revenue:'Platform Revenue (May)',a_commission:'Your Commission (10%)',a_users:'Registered Users',a_tasks_done:'Tasks Completed (May)',a_active_now:'Active Now',a_chart_revenue:'Monthly Revenue (€)',a_top_tasks:'Top Tasks',a_manage_tasks:'Manage Tasks',a_partners:'Partners',a_add_partner:'+ Add Partner',a_new_task:'NEW TASK',a_add_task_title:'Add Task to Platform',a_task_name:'Task Name',a_task_name_ph:'e.g. iOS App Testing',a_task_company:'Company',a_task_reward:'Reward (€)',a_task_time:'Time',a_task_diff:'Difficulty',a_task_cat:'Category',a_publish:'Publish Task →'},
+  de:{a_label:'Admin-Panel',a_title:'Eigentümer-Dashboard',a_live:'Live',a_add_task:'+ Aufgabe hinzufügen',a_revenue:'Plattformeinnahmen (Mai)',a_commission:'Ihre Provision (10%)',a_users:'Registrierte Nutzer',a_tasks_done:'Aufgaben erledigt (Mai)',a_active_now:'Jetzt aktiv',a_chart_revenue:'Monatlicher Umsatz (€)',a_top_tasks:'Top-Aufgaben',a_manage_tasks:'Aufgaben verwalten',a_partners:'Partner',a_add_partner:'+ Partner hinzufügen',a_new_task:'NEUE AUFGABE',a_add_task_title:'Aufgabe zur Plattform hinzufügen',a_task_name:'Aufgabenname',a_task_name_ph:'z.B. iOS-App-Test',a_task_company:'Unternehmen',a_task_reward:'Vergütung (€)',a_task_time:'Zeit',a_task_diff:'Schwierigkeit',a_task_cat:'Kategorie',a_publish:'Aufgabe veröffentlichen →'},
+  th:{a_label:'แผงผู้ดูแลระบบ',a_title:'แดชบอร์ดเจ้าของ',a_live:'สด',a_add_task:'+ เพิ่มงาน',a_revenue:'รายได้แพลตฟอร์ม (พ.ค.)',a_commission:'ค่าคอมมิชชัน (10%)',a_users:'ผู้ใช้ที่ลงทะเบียน',a_tasks_done:'งานเสร็จสิ้น (พ.ค.)',a_active_now:'ออนไลน์ตอนนี้',a_chart_revenue:'รายได้รายเดือน (€)',a_top_tasks:'งานยอดนิยม',a_manage_tasks:'จัดการงาน',a_partners:'พาร์ทเนอร์',a_add_partner:'+ เพิ่มพาร์ทเนอร์',a_new_task:'งานใหม่',a_add_task_title:'เพิ่มงานในแพลตฟอร์ม',a_task_name:'ชื่องาน',a_task_name_ph:'เช่น ทดสอบแอป iOS',a_task_company:'บริษัท',a_task_reward:'รางวัล (€)',a_task_time:'เวลา',a_task_diff:'ความยาก',a_task_cat:'หมวดหมู่',a_publish:'เผยแพร่งาน →'}
+};
+
+// Patch showSection for admin
+const _ss3 = window.showSection;
+window.showSection = function(id, btn) {
+  _ss3(id, btn);
+  if(id === 'admin') renderAdminDashboard();
+};
+
+// Patch setLang for admin
+const _sl4 = window.setLang;
+window.setLang = function(lang, btn) {
+  _sl4(lang, btn);
+  const t = A_I18N[lang] || A_I18N.pl;
+  Object.keys(t).forEach(k => {
+    document.querySelectorAll('[data-i18n="'+k+'"]').forEach(el => el.innerHTML = t[k]);
+    document.querySelectorAll('[data-i18n-placeholder="'+k+'"]').forEach(el => el.placeholder = t[k]);
+  });
+  if(document.getElementById('admin').classList.contains('visible')) renderAdminDashboard();
+};
+
+// ── FINAL INIT (must be last) ──
+window.setLang('pl', document.querySelector('.lang-btn.active'));
+
+
+
+
+</script>
+</body>
+</html>
